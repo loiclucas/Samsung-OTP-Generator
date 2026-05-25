@@ -1,1 +1,1 @@
-# Samsung-OTP-Generator-
+# Samsung-OTP-Generator

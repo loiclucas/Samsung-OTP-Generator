@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="58" viewBox="0 0 170 58" role="img" aria-label="F2G Solutions">
+  <rect width="170" height="58" fill="#ffffff"/>
+  <text x="10" y="38" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#424143">F2G</text>
+  <circle cx="94" cy="29" r="20" fill="none" stroke="#faa51a" stroke-width="6"/>
+  <path d="M94 9 A20 20 0 0 1 114 29" fill="none" stroke="#424143" stroke-width="6" stroke-linecap="round"/>
+  <text x="120" y="23" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#424143">SOLUTIONS</text>
+  <text x="120" y="39" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#faa51a">TELCO</text>
+</svg>

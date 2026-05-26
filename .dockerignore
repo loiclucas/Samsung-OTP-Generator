@@ -1,0 +1,9 @@
+target/
+*.jar
+*.tar
+.git/
+.idea/
+.vscode/
+.DS_Store
+logs/
+docker-image/

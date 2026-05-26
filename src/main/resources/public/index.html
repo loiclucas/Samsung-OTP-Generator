@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OTP Generator | F2G Solutions</title>
+  <style>
+    :root {
+      --primary: #faa51a;
+      --primary-dark: #e59414;
+      --dark: #424143;
+      --bg: #f9fafb;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --ok: #16a34a;
+      --bad: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    header img {
+      height: 52px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    main {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+      width: 100%;
+      max-width: 520px;
+      border: 1px solid var(--border);
+    }
+
+    label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: .85rem 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(250,165,26,0.18);
+    }
+
+    .field {
+      margin-top: 1rem;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+
+    button {
+      width: 100%;
+      padding: .85rem 1rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .05s;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button:active { transform: translateY(1px); }
+
+    #results {
+      margin-top: 1.25rem;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      line-height: 1.5;
+    }
+
+    .status.success { border-color: #bbf7d0; background: #f0fdf4; }
+    .status.error { border-color: #fecaca; background: #fef2f2; }
+
+    .small-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.15rem;
+    }
+
+    .recommended {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--ok);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th,td {
+      padding: .65rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--dark);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr.row-recommended {
+      background: #f0fdf4;
+      font-weight: 700;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      font-size: .875rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <img src="img/logo.svg" alt="F2G Solutions Logo">
+  <h1>OTP Generator</h1>
+</header>
+
+<main>
+  <section class="card">
+    <label for="seed">Input code:</label>
+    <input id="seed" type="text" maxlength="32" placeholder="Legacy key or Android 15+ 8-digit key" autocomplete="off">
+    <div class="hint">
+      The backend detects the key format and routes to the configured algorithm.
+    </div>
+
+    <div class="field">
+      <label for="formatHint">Android version:</label>
+      <select id="formatHint">
+        <option value="AUTO">Auto detect</option>
+        <option value="LEGACY_PRE_ANDROID_15">Old Android</option>
+        <option value="ANDROID_15_PLUS">Android 15+</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="authToken">Access token:</label>
+      <input id="authToken" type="password" placeholder="Required when OTP generation is enabled" autocomplete="off">
+    </div>
+
+    <button id="generate">Generate OTP authentication code</button>
+    <div id="results"></div>
+  </section>
+</main>
+
+<footer>&copy; <span id="year"></span> F2G Solutions. All rights reserved.</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function clear(element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+  }
+
+  function addText(parent, tagName, className, text) {
+    const element = document.createElement(tagName);
+    if (className) {
+      element.className = className;
+    }
+    element.textContent = text;
+    parent.appendChild(element);
+    return element;
+  }
+
+  function renderLoading(results) {
+    clear(results);
+    addText(results, 'div', 'status', 'Generating...');
+  }
+
+  function renderResponse(results, data) {
+    clear(results);
+    const status = document.createElement('div');
+    status.className = `status ${data.success ? 'success' : 'error'}`;
+    results.appendChild(status);
+
+    addText(status, 'span', 'small-label', 'Detected format');
+    const format = addText(status, 'div', '', data.keyFormat || 'UNKNOWN');
+    format.style.fontWeight = '700';
+
+    status.appendChild(document.createElement('br'));
+    addText(status, 'span', 'small-label', 'Status');
+    addText(status, 'div', '', data.message || data.error || '');
+
+    if (data.recommended) {
+      status.appendChild(document.createElement('br'));
+      addText(status, 'span', 'small-label', 'Recommended OTP');
+      addText(status, 'div', 'recommended', data.recommended);
+    }
+
+    if (data.suggestions && data.suggestions.length) {
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      addText(headerRow, 'th', '', 'Offset');
+      addText(headerRow, 'th', '', 'Code');
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      data.suggestions.forEach(item => {
+        const row = document.createElement('tr');
+        if (item.recommended) {
+          row.className = 'row-recommended';
+        }
+        addText(row, 'td', '', String(item.offset));
+        addText(row, 'td', '', item.code || '');
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      results.appendChild(table);
+    }
+  }
+
+  document.getElementById('generate').onclick = async () => {
+    const seed = document.getElementById('seed').value.trim();
+    const formatHint = document.getElementById('formatHint').value;
+    const authToken = document.getElementById('authToken').value.trim();
+    const results = document.getElementById('results');
+
+    if (!seed) {
+      alert('Please enter an input code.');
+      return;
+    }
+
+    renderLoading(results);
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['X-App-Auth-Token'] = authToken;
+      }
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ seed, formatHint })
+      });
+
+      const data = await response.json();
+      renderResponse(results, data);
+    } catch (err) {
+      renderResponse(results, { success: false, message: `Request failed: ${err.message}` });
+    }
+  };
+</script>
+</body>
+</html>

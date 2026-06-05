@@ -26,27 +26,42 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     header {
       width: 100%;
-      padding: 1rem 2rem;
+      padding: 1rem clamp(1rem, 4vw, 2rem);
       background: #fff;
       display: flex;
       align-items: center;
       gap: 1rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
 
-    header img {
-      height: 52px;
+    .logo-box {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 64px;
+      overflow: hidden;
+    }
+
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     header h1 {
       margin: 0;
-      font-size: 1.45rem;
+      font-size: clamp(1.45rem, 7vw, 2rem);
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
+      line-height: 1.15;
     }
 
     main {
@@ -91,6 +106,19 @@
 
     .field {
       margin-top: 1rem;
+    }
+
+    details {
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
     }
 
     .hint {
@@ -181,11 +209,40 @@
       color: var(--muted);
       text-align: center;
     }
+
+    .build-label {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 520px) {
+      header {
+        gap: 0.75rem;
+      }
+
+      .logo-box {
+        width: 72px;
+        height: 72px;
+        flex-basis: 72px;
+      }
+
+      main {
+        padding: 2rem 1.5rem;
+      }
+
+      .card {
+        padding: 2rem;
+        border-radius: 18px;
+      }
+    }
   </style>
 </head>
 <body>
 <header>
-  <img src="img/logo.svg" alt="F2G Solutions Logo">
+  <div class="logo-box">
+    <img src="img/logo.png" alt="F2G Solutions Logo">
+  </div>
   <h1>OTP Generator</h1>
 </header>
 
@@ -193,33 +250,45 @@
   <section class="card">
     <label for="seed">Input code:</label>
     <input id="seed" type="text" maxlength="32" placeholder="Legacy key or Android 15+ 8-digit key" autocomplete="off">
-    <div class="hint">
-      The backend detects the key format and routes to the configured algorithm.
-    </div>
-
-    <div class="field">
-      <label for="formatHint">Android version:</label>
-      <select id="formatHint">
-        <option value="AUTO">Auto detect</option>
-        <option value="LEGACY_PRE_ANDROID_15">Old Android</option>
-        <option value="ANDROID_15_PLUS">Android 15+</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="authToken">Access token:</label>
-      <input id="authToken" type="password" placeholder="Required when OTP generation is enabled" autocomplete="off">
-    </div>
 
     <button id="generate">Generate OTP authentication code</button>
+    <details>
+      <summary>Advanced options</summary>
+      <div class="hint">
+        Auto detects 5-character old Android keys and Android 15+ 8-digit keys.
+      </div>
+
+      <div class="field">
+        <label for="formatHint">Android version:</label>
+        <select id="formatHint">
+          <option value="AUTO">Auto detect</option>
+          <option value="OLD_ANDROID_COMPAT">Old Android compatibility</option>
+          <option value="OLD_ANDROID_SCREENSHOT">Old Android screenshot logic</option>
+          <option value="ANDROID_15_PLUS">Android 15+</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="authToken">Access token:</label>
+        <input id="authToken" type="password" placeholder="Required when OTP generation is enabled" autocomplete="off">
+      </div>
+    </details>
     <div id="results"></div>
   </section>
 </main>
 
-<footer>&copy; <span id="year"></span> F2G Solutions. All rights reserved.</footer>
+<footer>&copy; <span id="year"></span> F2G Solutions. All rights reserved.<span id="buildLabel" class="build-label"></span></footer>
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+  fetch('/api/version')
+    .then(response => response.ok ? response.json() : null)
+    .then(data => {
+      if (data && data.version) {
+        document.getElementById('buildLabel').textContent = `Build ${data.version}`;
+      }
+    })
+    .catch(() => {});
 
   function clear(element) {
     while (element.firstChild) {

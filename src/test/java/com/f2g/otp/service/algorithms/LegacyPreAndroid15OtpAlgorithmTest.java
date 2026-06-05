@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LegacyPreAndroid15OtpAlgorithmTest {
     @Test
-    void portsLegacyHashCodeExactly() {
+    void portsScreenshotHashCodeExactly() {
         LegacyPreAndroid15OtpAlgorithm algorithm = new LegacyPreAndroid15OtpAlgorithm();
 
         assertEquals(91318, algorithm.makeHashCode("yp810"));

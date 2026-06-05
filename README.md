@@ -68,12 +68,17 @@ curl -X POST http://localhost:8080/api/generate \
 `formatHint` is optional:
 
 - `AUTO`
-- `LEGACY_PRE_ANDROID_15`
+- `OLD_ANDROID_COMPAT`
+- `OLD_ANDROID_SCREENSHOT`
 - `ANDROID_15_PLUS`
+
+`AUTO` routes 5-character mixed keys to the old Android compatibility algorithm and 8-digit numeric keys to Android 15+.
 
 ## Export image for another server
 
 ```powershell
+docker rm -f samsung-otp-generator 2>$null
+docker build --no-cache -t samsung-otp-generator:latest .
 .\scripts\export-image.ps1 -OutputDir ".\docker-image"
 ```
 
@@ -86,11 +91,18 @@ On the server:
 
 ```bash
 docker load -i samsung-otp-generator.tar
+docker rm -f samsung-otp-generator
 docker run -d --name samsung-otp-generator -p 8080:8080 \
   -e OTP_ENABLED=true \
   -e APP_AUTH_TOKEN="<set-private-token>" \
   -e ANDROID15_SECRET_KEY_HEX="<set-private-hex-key>" \
   samsung-otp-generator:latest
+```
+
+Confirm the running image is current:
+
+```bash
+curl http://localhost:8080/api/version
 ```
 
 ## Security notes

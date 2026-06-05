@@ -1,7 +1,8 @@
 package com.f2g.otp.service;
 
 public enum KeyFormat {
-    LEGACY_PRE_ANDROID_15,
+    OLD_ANDROID_COMPAT,
+    OLD_ANDROID_SCREENSHOT,
     ANDROID_15_PLUS,
     UNKNOWN
 }

@@ -18,7 +18,7 @@ class OtpServiceTest {
     void detectsLegacyMixedKeys() {
         OtpService service = new OtpService(AppConfig.from(Map.of()));
 
-        assertEquals(KeyFormat.LEGACY_PRE_ANDROID_15, service.detectFormat("yp810"));
+        assertEquals(KeyFormat.OLD_ANDROID_COMPAT, service.detectFormat("yz7h5"));
     }
 
     @Test
@@ -26,8 +26,18 @@ class OtpServiceTest {
         OtpService service = new OtpService(AppConfig.from(Map.of()));
 
         assertEquals(
-            KeyFormat.LEGACY_PRE_ANDROID_15,
-            service.resolveFormat("12345678", FormatHint.LEGACY_PRE_ANDROID_15)
+            KeyFormat.OLD_ANDROID_SCREENSHOT,
+            service.resolveFormat("yz7h5", FormatHint.OLD_ANDROID_SCREENSHOT)
+        );
+    }
+
+    @Test
+    void legacyPreAndroid15HintRemainsBackwardCompatible() {
+        OtpService service = new OtpService(AppConfig.from(Map.of()));
+
+        assertEquals(
+            KeyFormat.OLD_ANDROID_COMPAT,
+            service.resolveFormat("yz7h5", FormatHint.LEGACY_PRE_ANDROID_15)
         );
     }
 }

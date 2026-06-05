@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
 import java.util.Map;
 
 public class OtpWebApp {
@@ -28,6 +29,12 @@ public class OtpWebApp {
         }).start(port);
 
         app.get("/health", ctx -> ctx.json(Map.of("status", "ok")));
+        app.get("/api/version", ctx -> ctx.json(Map.of(
+            "name", "samsung-otp-generator",
+            "version", System.getenv().getOrDefault("APP_VERSION", "dev"),
+            "otpEnabled", appConfig.otpEnabled,
+            "modes", List.of("OLD_ANDROID_COMPAT", "OLD_ANDROID_SCREENSHOT", "ANDROID_15_PLUS")
+        )));
         app.post("/api/generate", ctx -> handleGenerate(ctx, appConfig, otpService));
 
         log.info("OTP web application started on port {} otpEnabled={}", port, appConfig.otpEnabled);
